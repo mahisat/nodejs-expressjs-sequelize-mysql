@@ -8,7 +8,7 @@ module.exports = {
     //Validate the request
     const result = validateQuote(req.body);
     if (result.error) {
-      return res.status(400).send(result.error.details[0].message);
+      return res.status(400).send({ message: result.error.details[0].message });
     }
     //If validation success
     const quote = {
@@ -17,9 +17,14 @@ module.exports = {
       activeStatus: 1,
     };
     return Quote.create(quote)
-      .then((quote) => res.status(200).send(quote))
+      .then((quote) =>
+        res.status(200).send({
+          message: "Quote was created successfully.",
+          quote: quote,
+        })
+      )
       .catch((error) =>
-        res.status(500).json({ message: "Error on creating quote" })
+        res.status(500).send({ message: "Error on creating quote" })
       );
   },
 
@@ -31,7 +36,7 @@ module.exports = {
     //Validate the request
     const result = validateQuote(req.body);
     if (result.error) {
-      return res.status(400).send(result.error.details[0].message);
+      return res.status(400).send({ message: result.error.details[0].message });
     }
     const quote = {
       quote: req.body.quote,
@@ -46,7 +51,7 @@ module.exports = {
             message: "Quote was updated successfully.",
           });
         } else {
-          res.status(200).send({
+          res.status(404).send({
             message: `Cannot update Quote with id=${id}. Maybe quote was not found or req.body is empty!`,
           });
         }
@@ -68,7 +73,7 @@ module.exports = {
     })
       .then((quotes) => res.status(200).send({ quotes }))
       .catch((error) =>
-        res.json({
+        res.status(500).send({
           message: "Error on retrieving quotes",
         })
       );
